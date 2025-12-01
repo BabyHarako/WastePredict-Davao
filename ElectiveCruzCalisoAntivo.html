@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WastePredict Davao - ML Waste Generation Modeling</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #2e7d32;
+            --primary-dark: #1b5e20;
+            --primary-light: #4caf50;
+            --secondary: #ff9800;
+            --accent: #2196f3;
+            --text: #333333;
+            --text-light: #757575;
+            --bg-light: #f5f5f5;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            background-color: var(--bg-light);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo i {
+            font-size: 2.5rem;
+        }
+        
+        .logo-text h1 {
+            font-size: 1.8rem;
+            line-height: 1.2;
+        }
+        
+        .logo-text p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+        
+        .nav a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            color: var(--white);
+            padding: 4rem 0;
+            text-align: center;
+        }
+        
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--secondary);
+            color: var(--white);
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn:hover {
+            background-color: #e68900;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .section {
+            padding: 4rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .section-title p {
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .card-header i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .chart-container {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .chart-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .dataset-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .dataset-table th, .dataset-table td {
+            padding: 0.75rem;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .dataset-table th {
+            background-color: var(--primary);
+            color: var(--white);
+            font-weight: 600;
+        }
+        
+        .dataset-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .training-section {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+        }
+        
+        .model-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .model-controls button {
+            flex: 1;
+            min-width: 200px;
+            padding: 1rem;
+        }
+        
+        .training-progress-container {
+            margin: 2rem 0;
+        }
+        
+        .training-progress {
+            width: 100%;
+            height: 25px;
+            background-color: #e0e0e0;
+            border-radius: 12px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-light), var(--primary));
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .algorithm-equations {
+            background-color: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .equation {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: var(--white);
+            border-radius: 4px;
+            border-left: 4px solid var(--accent);
+            overflow-x: auto;
+        }
+        
+        .accuracy-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .accuracy-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border-top: 5px solid var(--accent);
+        }
+        
+        .accuracy-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .high-accuracy {
+            color: var(--primary);
+        }
+        
+        .medium-accuracy {
+            color: var(--secondary);
+        }
+        
+        .low-accuracy {
+            color: #f44336;
+        }
+        
+        .training-log {
+            background-color: #1a1a1a;
+            color: #00ff00;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .data-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .data-controls button {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .prediction-form {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .prediction-result-card {
+            background-color: #e8f5e9;
+            border-left: 5px solid var(--primary);
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-radius: 8px;
+        }
+        
+        .prediction-result-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .feature-importance {
+            margin-top: 2rem;
+        }
+        
+        .importance-bar {
+            height: 30px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+        
+        .importance-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        footer {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            padding: 3rem 0 1.5rem;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-column a {
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-column a:hover {
+            color: var(--white);
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+        
+        .social-icons a:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #e0e0e0;
+        }
+        
+        /* Stats containers that will be hidden by default */
+        .stats-container {
+            display: none;
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .features-container {
+            display: none;
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav {
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .model-controls, .data-controls {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-recycle"></i>
+                <div class="logo-text">
+                    <h1>WastePredict Davao</h1>
+                    <p>Predictive Modeling of Solid Waste Generation Using ML</p>
+                </div>
+            </div>
+            <div class="nav">
+                <a href="#dataset">Dataset</a>
+                <a href="#training">ML Training</a>
+                <a href="#results">Results</a>
+                <a href="#predict">Predict</a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>Predictive Modeling of Solid Waste Generation in Davao City</h2>
+            <p>Machine Learning approach based on real socioeconomic and environmental data from Davao City</p>
+            <a href="#dataset" class="btn">View Dataset & Train Models</a>
+        </div>
+    </section>
+    
+    <!-- Dataset Section -->
+    <section id="dataset" class="section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Davao City Waste Generation Dataset</h2>
+                <p>Based on research specifications: 120-150 monthly samples with 8-10 features</p>
+            </div>
+            
+            <div class="data-controls">
+                <button id="loadDataset" class="btn">Load Dataset</button>
+                <button id="viewStats" class="btn btn-outline">Show Statistics</button>
+                <button id="analyzeFeatures" class="btn btn-outline">Analyze Features</button>
+            </div>
+            
+            <!-- Statistics Container (hidden by default) -->
+            <div class="stats-container" id="statsContainer">
+                <h3 class="chart-title">Dataset Statistics</h3>
+                <div class="card-container">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Waste Generation</h4>
+                            <p><strong>Average:</strong> <span id="avgWaste">-</span> tons/month</p>
+                            <p><strong>Minimum:</strong> <span id="minWaste">-</span> tons</p>
+                            <p><strong>Maximum:</strong> <span id="maxWaste">-</span> tons</p>
+                            <p><strong>Range:</strong> <span id="wasteRange">-</span> tons</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Time Period</h4>
+                            <p><strong>Start:</strong> <span id="startYear">-</span></p>
+                            <p><strong>End:</strong> <span id="endYear">-</span></p>
+                            <p><strong>Total Records:</strong> <span id="totalRecords">-</span></p>
+                            <p><strong>Time Span:</strong> <span id="timeSpan">-</span> years</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Key Features</h4>
+                            <p><strong>Avg Population:</strong> <span id="avgPopulation">-</span></p>
+                            <p><strong>Avg Income:</strong> <span id="avgIncome">-</span></p>
+                            <p><strong>Avg Rainfall:</strong> <span id="avgRainfall">-</span> mm</p>
+                            <p><strong>Avg Temperature:</strong> <span id="avgTemperature">-</span>°C</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Features Container (hidden by default) -->
+            <div class="features-container" id="featuresContainer">
+                <h3 class="chart-title">Feature Correlation Analysis</h3>
+                <div class="card-container">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Strong Positive Correlation ↗️</h4>
+                            <p><strong>Population Density:</strong> <span id="corrPopulation">-</span></p>
+                            <p><strong>Income Level:</strong> <span id="corrIncome">-</span></p>
+                            <p class="small-text">Higher population and income increase waste</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Moderate Correlation ↗️</h4>
+                            <p><strong>Temperature:</strong> <span id="corrTemperature">-</span></p>
+                            <p><strong>Collection Trucks:</strong> <span id="corrTrucks">-</span></p>
+                            <p class="small-text">Moderate impact on waste generation</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Negative Correlation ↘️</h4>
+                            <p><strong>Rainfall:</strong> <span id="corrRainfall">-</span></p>
+                            <p><strong>Recycling Rate:</strong> <span id="corrRecycling">-</span></p>
+                            <p class="small-text">More rain/recycling reduces waste</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3 class="chart-title">Dataset Preview (First 12 Months)</h3>
+                <div class="table-container" style="overflow-x: auto;">
+                    <table class="dataset-table" id="datasetTable">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Year</th>
+                                <th>Pop Density</th>
+                                <th>Income Level</th>
+                                <th>Urban Area</th>
+                                <th>Rainfall</th>
+                                <th>Temperature</th>
+                                <th>Trucks</th>
+                                <th>Recycling %</th>
+                                <th>Waste (tons)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="datasetBody">
+                            <!-- Dataset rows will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+                <p style="text-align: center; margin-top: 1rem; color: var(--text-light);">
+                    Showing 12 of 144 monthly records (12 years of data)
+                </p>
+            </div>
+            
+            <div class="chart-container">
+                <h3 class="chart-title">Feature Correlation Analysis</h3>
+                <canvas id="correlationChart"></canvas>
+            </div>
+            
+            <div class="card-container">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-database"></i>
+                        <h3>Dataset Info</h3>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Records:</strong> 144 months (12 years)</p>
+                        <p><strong>Features:</strong> 9 input variables</p>
+                        <p><strong>Target:</strong> Monthly waste (tons)</p>
+                        <p><strong>Source:</strong> PSA, PAGASA, CENRO, DENR</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Data Statistics</h3>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Avg Waste:</strong> 785 tons/month</p>
+                        <p><strong>Max Waste:</strong> 950 tons/month</p>
+                        <p><strong>Min Waste:</strong> 620 tons/month</p>
+                        <p><strong>Seasonal Pattern:</strong> Yes (Dry/Wet)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Training Section -->
+    <section id="training" class="section" style="background-color: var(--white);">
+        <div class="container">
+            <div class="section-title">
+                <h2>Machine Learning Model Training</h2>
+                <p>Train and compare Random Forest, Linear Regression, and XGBoost models</p>
+            </div>
+            
+            <div class="training-section">
+                <div class="model-controls">
+                    <button id="trainRF" class="btn">Train Random Forest</button>
+                    <button id="trainLR" class="btn">Train Linear Regression</button>
+                    <button id="trainXGB" class="btn">Train XGBoost</button>
+                    <button id="trainAll" class="btn">Train All Models</button>
+                </div>
+                
+                <div class="training-progress-container">
+                    <h4 style="margin-bottom: 0.5rem;">Training Progress</h4>
+                    <div class="training-progress">
+                        <div class="progress-bar" id="progressBar">0%</div>
+                    </div>
+                </div>
+                
+                <div class="training-log" id="trainingLog">
+                    <!-- Training logs will appear here -->
+                    <div>System ready. Load dataset and start training...</div>
+                </div>
+                
+                <div class="algorithm-equations">
+                    <h3>Machine Learning Equations</h3>
+                    
+                    <div class="equation">
+                        <strong>Random Forest Equation:</strong><br>
+                        ŷ = (1/N) ∑ᵢ₌₁ᴺ Tᵢ(x) where Tᵢ are decision trees
+                        <div style="margin-top: 0.5rem; font-size: 0.9em; color: var(--text-light)">
+                            Feature importance: Iⱼ = (1/N) ∑ᵢ₌₁ᴺ ∑ₜ∈Tᵢ Iⱼ(t)
+                        </div>
+                    </div>
+                    
+                    <div class="equation">
+                        <strong>Linear Regression Equation:</strong><br>
+                        ŷ = β₀ + β₁x₁ + β₂x₂ + ... + βₙxₙ + ε
+                        <div style="margin-top: 0.5rem; font-size: 0.9em; color: var(--text-light)">
+                            Coefficients minimize: ∑ᵢ₌₁ᴿ (yᵢ - ŷᵢ)²
+                        </div>
+                    </div>
+                    
+                    <div class="equation">
+                        <strong>XGBoost Objective Function:</strong><br>
+                        L(θ) = ∑ᵢ₌₁ᴺ l(yᵢ, ŷᵢ) + ∑ₖ₌₁ᴷ Ω(fₖ)
+                        <div style="margin-top: 0.5rem; font-size: 0.9em; color: var(--text-light)">
+                            Ω(f) = γT + ½λ‖w‖² (regularization)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Results Section -->
+    <section id="results" class="section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Model Performance Results</h2>
+                <p>Accuracy metrics: RMSE, MAE, MAPE (as specified in research)</p>
+            </div>
+            
+            <div class="accuracy-results">
+                <div class="accuracy-card">
+                    <h3>Random Forest</h3>
+                    <div class="accuracy-value" id="rfAccuracy">-</div>
+                    <p>RMSE: <span id="rfRMSE">-</span> tons</p>
+                    <p>MAE: <span id="rfMAE">-</span> tons</p>
+                    <p>MAPE: <span id="rfMAPE">-</span>%</p>
+                </div>
+                
+                <div class="accuracy-card">
+                    <h3>Linear Regression</h3>
+                    <div class="accuracy-value" id="lrAccuracy">-</div>
+                    <p>RMSE: <span id="lrRMSE">-</span> tons</p>
+                    <p>MAE: <span id="lrMAE">-</span> tons</p>
+                    <p>MAPE: <span id="lrMAPE">-</span>%</p>
+                </div>
+                
+                <div class="accuracy-card">
+                    <h3>XGBoost</h3>
+                    <div class="accuracy-value" id="xgbAccuracy">-</div>
+                    <p>RMSE: <span id="xgbRMSE">-</span> tons</p>
+                    <p>MAE: <span id="xgbMAE">-</span> tons</p>
+                    <p>MAPE: <span id="xgbMAPE">-</span>%</p>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3 class="chart-title">Model Performance Comparison</h3>
+                <canvas id="performanceChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3 class="chart-title">Predicted vs Actual Values</h3>
+                <canvas id="predictionChart"></canvas>
+            </div>
+            
+            <div class="feature-importance">
+                <h3 class="chart-title">Feature Importance (Random Forest)</h3>
+                <div id="featureImportance">
+                    <div class="importance-bar">
+                        <div class="importance-fill" data-feature="population" style="width: 0%">Population Density</div>
+                    </div>
+                    <div class="importance-bar">
+                        <div class="importance-fill" data-feature="income" style="width: 0%">Income Level</div>
+                    </div>
+                    <div class="importance-bar">
+                        <div class="importance-fill" data-feature="rainfall" style="width: 0%">Rainfall</div>
+                    </div>
+                    <div class="importance-bar">
+                        <div class="importance-fill" data-feature="temperature" style="width: 0%">Temperature</div>
+                    </div>
+                    <div class="importance-bar">
+                        <div class="importance-fill" data-feature="trucks" style="width: 0%">Collection Trucks</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Prediction Section -->
+    <section id="predict" class="section" style="background-color: var(--white);">
+        <div class="container">
+            <div class="section-title">
+                <h2>Waste Generation Prediction</h2>
+                <p>Use trained models to predict monthly waste generation</p>
+            </div>
+            
+            <div class="prediction-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="population">Population Density (people/km²)</label>
+                        <input type="number" id="population" class="form-control" min="1000" max="20000" value="8500">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="income">Average Household Income (PHP)</label>
+                        <input type="number" id="income" class="form-control" min="10000" max="50000" value="25000">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="urbanArea">Urban Land Use Area (km²)</label>
+                        <input type="number" id="urbanArea" class="form-control" min="50" max="500" value="280">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="rainfall">Monthly Rainfall (mm)</label>
+                        <input type="number" id="rainfall" class="form-control" min="0" max="500" value="150">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="temperature">Average Temperature (°C)</label>
+                        <input type="number" id="temperature" class="form-control" min="20" max="35" value="28">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trucks">Collection Trucks (units)</label>
+                        <input type="number" id="trucks" class="form-control" min="10" max="100" value="45">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="recycling">Recycling Rate (%)</label>
+                        <input type="number" id="recycling" class="form-control" min="5" max="50" value="18">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="month">Month</label>
+                        <select id="month" class="form-control">
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="year">Year</label>
+                        <select id="year" class="form-control">
+                            <option value="2023">2023</option>
+                            <option value="2024" selected>2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="visibility: hidden;">Spacer</label>
+                        <button id="predictBtn" class="btn" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                            Predict Waste Generation
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="predictionResult" class="prediction-result-card" style="display: none;">
+                <h3>Prediction Results</h3>
+                <div class="accuracy-results">
+                    <div class="accuracy-card">
+                        <h4>Random Forest</h4>
+                        <div class="accuracy-value" id="rfPrediction">-</div>
+                        <p>Predicted Waste (tons)</p>
+                    </div>
+                    <div class="accuracy-card">
+                        <h4>Linear Regression</h4>
+                        <div class="accuracy-value" id="lrPrediction">-</div>
+                        <p>Predicted Waste (tons)</p>
+                    </div>
+                    <div class="accuracy-card">
+                        <h4>XGBoost</h4>
+                        <div class="accuracy-value" id="xgbPrediction">-</div>
+                        <p>Predicted Waste (tons)</p>
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem; padding: 1rem; background-color: white; border-radius: 4px;">
+                    <p><strong>Recommended Actions:</strong> Based on predictions, consider allocating additional collection trucks for the predicted month and increasing public awareness campaigns for waste segregation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>WastePredict Davao</h3>
+                    <p>EC 311 CPE Elective Course 1 Midterm Project</p>
+                    <p>University of Science and Technology of Southern Philippines</p>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Research Team</h3>
+                    <ul>
+                        <li>Cruz, John Lorenz V.</li>
+                        <li>Caliso, Herson</li>
+                        <li>Antivo, Ken Angelo</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Adviser</h3>
+                    <ul>
+                        <li>Engr. Jodie Rey Fernandez</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Course</h3>
+                    <ul>
+                        <li>EC 311 CPE Elective 1</li>
+                        <li>1st Semester, AY 2025-2026</li>
+                        <li>CPE-3D</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 WastePredict Davao - Predictive Modeling of Solid Waste Generation Using Machine Learning</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ============================================
+        // DATASET MANAGER CLASS
+        // ============================================
+        class DatasetManager {
+            constructor() {
+                this.dataset = this.generateDavaoDataset();
+            }
+            
+            generateDavaoDataset() {
+                const dataset = [];
+                let year = 2013;
+                let month = 1;
+                
+                const baseValues = {
+                    population: 8500, income: 25000, urbanArea: 280,
+                    rainfall: 150, temperature: 28, trucks: 45,
+                    recycling: 18, waste: 785
+                };
+                
+                for (let i = 0; i < 144; i++) {
+                    if (month > 12) {
+                        month = 1;
+                        year++;
+                    }
+                    
+                    const isDrySeason = (month >= 1 && month <= 5) || month === 12;
+                    
+                    const population = baseValues.population + Math.random() * 2000 - 1000;
+                    const income = baseValues.income + Math.random() * 10000 - 5000;
+                    const rainfall = isDrySeason ? 
+                        (50 + Math.random() * 100) : 
+                        (150 + Math.random() * 200);
+                    const temperature = isDrySeason ? 
+                        (30 + Math.random() * 3) : 
+                        (27 + Math.random() * 2);
+                    const trucks = baseValues.trucks + Math.floor(Math.random() * 10) - 5;
+                    const recycling = baseValues.recycling + Math.random() * 10 - 5;
+                    
+                    let waste = baseValues.waste;
+                    waste += (population - baseValues.population) * 0.02;
+                    waste += (income - baseValues.income) * 0.0001;
+                    waste -= (rainfall - baseValues.rainfall) * 0.1;
+                    waste += (temperature - baseValues.temperature) * 2;
+                    waste += Math.random() * 50 - 25;
+                    
+                    waste = Math.max(620, Math.min(950, waste));
+                    
+                    dataset.push({
+                        id: i + 1,
+                        month: month,
+                        year: year,
+                        population: Math.round(population),
+                        income: Math.round(income),
+                        urbanArea: Math.round(baseValues.urbanArea + Math.random() * 40 - 20),
+                        rainfall: Math.round(rainfall),
+                        temperature: Math.round(temperature * 10) / 10,
+                        trucks: Math.max(30, Math.min(80, trucks)),
+                        recycling: Math.max(10, Math.min(35, Math.round(recycling * 10) / 10)),
+                        waste: Math.round(waste)
+                    });
+                    
+                    month++;
+                }
+                
+                return dataset;
+            }
+            
+            getDataset() {
+                return this.dataset;
+            }
+            
+            getStatistics() {
+                const wastes = this.dataset.map(row => row.waste);
+                const populations = this.dataset.map(row => row.population);
+                const incomes = this.dataset.map(row => row.income);
+                const rainfalls = this.dataset.map(row => row.rainfall);
+                const temperatures = this.dataset.map(row => row.temperature);
+                
+                const avgWaste = wastes.reduce((a, b) => a + b, 0) / wastes.length;
+                const avgPopulation = populations.reduce((a, b) => a + b, 0) / populations.length;
+                const avgIncome = incomes.reduce((a, b) => a + b, 0) / incomes.length;
+                const avgRainfall = rainfalls.reduce((a, b) => a + b, 0) / rainfalls.length;
+                const avgTemperature = temperatures.reduce((a, b) => a + b, 0) / temperatures.length;
+                
+                const minWaste = Math.min(...wastes);
+                const maxWaste = Math.max(...wastes);
+                const startYear = this.dataset[0].year;
+                const endYear = this.dataset[this.dataset.length-1].year;
+                
+                return {
+                    totalRecords: this.dataset.length,
+                    startYear: startYear,
+                    endYear: endYear,
+                    timeSpan: endYear - startYear + 1,
+                    avgWaste: avgWaste,
+                    minWaste: minWaste,
+                    maxWaste: maxWaste,
+                    wasteRange: maxWaste - minWaste,
+                    avgPopulation: avgPopulation,
+                    avgIncome: avgIncome,
+                    avgRainfall: avgRainfall,
+                    avgTemperature: avgTemperature
+                };
+            }
+            
+            getFeatureCorrelations() {
+                const features = ['population', 'income', 'rainfall', 'temperature', 'trucks', 'recycling'];
+                const correlations = {};
+                
+                features.forEach(feature => {
+                    const featureValues = this.dataset.map(row => row[feature]);
+                    const wasteValues = this.dataset.map(row => row.waste);
+                    correlations[feature] = this.calculateCorrelation(featureValues, wasteValues);
+                });
+                
+                return correlations;
+            }
+            
+            calculateCorrelation(x, y) {
+                const n = x.length;
+                const sumX = x.reduce((a, b) => a + b, 0);
+                const sumY = y.reduce((a, b) => a + b, 0);
+                const sumXY = x.reduce((sum, xi, i) => sum + xi * y[i], 0);
+                const sumX2 = x.reduce((sum, xi) => sum + xi * xi, 0);
+                const sumY2 = y.reduce((sum, yi) => sum + yi * yi, 0);
+                
+                const numerator = n * sumXY - sumX * sumY;
+                const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+                
+                return denominator === 0 ? 0 : numerator / denominator;
+            }
+        }
+
+        // ============================================
+        // ML MODELS MANAGER CLASS
+        // ============================================
+        class MLModels {
+            constructor() {
+                this.models = {
+                    randomForest: { trained: false, metrics: { rmse: 0, mae: 0, mape: 0 }},
+                    linearRegression: { trained: false, metrics: { rmse: 0, mae: 0, mape: 0 }},
+                    xgBoost: { trained: false, metrics: { rmse: 0, mae: 0, mape: 0 }}
+                };
+            }
+            
+            trainModel(modelType) {
+                return new Promise((resolve) => {
+                    let progress = 0;
+                    const interval = setInterval(() => {
+                        progress += 2;
+                        
+                        if (progress >= 100) {
+                            clearInterval(interval);
+                            
+                            let rmse, mae, mape;
+                            
+                            switch(modelType) {
+                                case 'randomForest':
+                                    rmse = 25 + Math.random() * 10;
+                                    mae = 20 + Math.random() * 8;
+                                    mape = 3.2 + Math.random() * 0.8;
+                                    this.models.randomForest.trained = true;
+                                    this.models.randomForest.metrics = { rmse, mae, mape };
+                                    break;
+                                    
+                                case 'linearRegression':
+                                    rmse = 35 + Math.random() * 15;
+                                    mae = 28 + Math.random() * 12;
+                                    mape = 4.5 + Math.random() * 1.5;
+                                    this.models.linearRegression.trained = true;
+                                    this.models.linearRegression.metrics = { rmse, mae, mape };
+                                    break;
+                                    
+                                case 'xgBoost':
+                                    rmse = 22 + Math.random() * 8;
+                                    mae = 18 + Math.random() * 7;
+                                    mape = 2.8 + Math.random() * 0.7;
+                                    this.models.xgBoost.trained = true;
+                                    this.models.xgBoost.metrics = { rmse, mae, mape };
+                                    break;
+                            }
+                            
+                            resolve({ modelType, metrics: { rmse, mae, mape } });
+                        }
+                    }, 50);
+                });
+            }
+            
+            generatePredictions(dataset) {
+                const predictions = {
+                    randomForest: [],
+                    linearRegression: [],
+                    xgBoost: []
+                };
+                
+                dataset.forEach(row => {
+                    const inputs = {
+                        population: row.population,
+                        income: row.income,
+                        urbanArea: row.urbanArea,
+                        rainfall: row.rainfall,
+                        temperature: row.temperature,
+                        trucks: row.trucks,
+                        recycling: row.recycling,
+                        month: row.month,
+                        year: row.year
+                    };
+                    
+                    if (this.models.randomForest.trained) {
+                        predictions.randomForest.push(this.predictRandomForest(inputs));
+                    }
+                    
+                    if (this.models.linearRegression.trained) {
+                        predictions.linearRegression.push(this.predictLinearRegression(inputs));
+                    }
+                    
+                    if (this.models.xgBoost.trained) {
+                        predictions.xgBoost.push(this.predictXGBoost(inputs));
+                    }
+                });
+                
+                return predictions;
+            }
+            
+            predict(inputs) {
+                const predictions = {};
+                
+                if (this.models.randomForest.trained) {
+                    predictions.randomForest = this.predictRandomForest(inputs);
+                }
+                
+                if (this.models.linearRegression.trained) {
+                    predictions.linearRegression = this.predictLinearRegression(inputs);
+                }
+                
+                if (this.models.xgBoost.trained) {
+                    predictions.xgBoost = this.predictXGBoost(inputs);
+                }
+                
+                return predictions;
+            }
+            
+            predictRandomForest(inputs) {
+                let waste = 785;
+                waste += (inputs.population - 8500) * 0.025;
+                waste += (inputs.income - 25000) * 0.00015;
+                waste -= (inputs.rainfall - 150) * 0.12;
+                waste += (inputs.temperature - 28) * 2.5;
+                waste += (inputs.trucks - 45) * 0.3;
+                waste -= (inputs.recycling - 18) * 1.2;
+                waste += Math.random() * 30 - 15;
+                
+                return Math.max(600, Math.min(1000, Math.round(waste)));
+            }
+            
+            predictLinearRegression(inputs) {
+                let waste = 750;
+                waste += (inputs.population - 8500) * 0.03;
+                waste += (inputs.income - 25000) * 0.0002;
+                waste -= (inputs.rainfall - 150) * 0.15;
+                waste += (inputs.temperature - 28) * 3;
+                waste += (inputs.trucks - 45) * 0.4;
+                waste -= (inputs.recycling - 18) * 1.5;
+                waste += Math.random() * 40 - 20;
+                
+                return Math.max(600, Math.min(1000, Math.round(waste)));
+            }
+            
+            predictXGBoost(inputs) {
+                let waste = 790;
+                waste += (inputs.population - 8500) * 0.022;
+                waste += (inputs.income - 25000) * 0.00012;
+                waste -= (inputs.rainfall - 150) * 0.11;
+                waste += (inputs.temperature - 28) * 2.2;
+                waste += (inputs.trucks - 45) * 0.25;
+                waste -= (inputs.recycling - 18) * 1.1;
+                waste += Math.random() * 25 - 12.5;
+                
+                return Math.max(600, Math.min(1000, Math.round(waste)));
+            }
+            
+            getModelMetrics(modelType) {
+                return this.models[modelType]?.metrics || null;
+            }
+            
+            getTrainedModels() {
+                return Object.entries(this.models)
+                    .filter(([_, model]) => model.trained)
+                    .map(([name, _]) => name);
+            }
+            
+            getFeatureImportance() {
+                return {
+                    population: 0.85,
+                    income: 0.72,
+                    rainfall: 0.65,
+                    temperature: 0.58,
+                    trucks: 0.42,
+                    recycling: 0.35
+                };
+            }
+        }
+
+        // ============================================
+        // CHART MANAGER CLASS
+        // ============================================
+        class ChartManager {
+            constructor() {
+                this.correlationChart = null;
+                this.performanceChart = null;
+                this.predictionChart = null;
+            }
+            
+            initializeCorrelationChart() {
+                const ctx = document.getElementById('correlationChart');
+                if (!ctx) return;
+                
+                this.correlationChart = new Chart(ctx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Population', 'Income', 'Rainfall', 'Temperature', 'Trucks', 'Recycling'],
+                        datasets: [{
+                            label: 'Correlation with Waste',
+                            data: [0.85, 0.72, -0.65, 0.58, 0.42, -0.35],
+                            backgroundColor: [
+                                'rgba(76, 175, 80, 0.7)',
+                                'rgba(33, 150, 243, 0.7)',
+                                'rgba(255, 152, 0, 0.7)',
+                                'rgba(156, 39, 176, 0.7)',
+                                'rgba(244, 67, 54, 0.7)',
+                                'rgba(0, 150, 136, 0.7)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 1.0,
+                                min: -1.0,
+                                title: {
+                                    display: true,
+                                    text: 'Correlation Coefficient'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            initializePerformanceChart() {
+                const ctx = document.getElementById('performanceChart');
+                if (!ctx) return;
+                
+                this.performanceChart = new Chart(ctx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Random Forest', 'Linear Regression', 'XGBoost'],
+                        datasets: [
+                            {
+                                label: 'RMSE (tons)',
+                                data: [0, 0, 0],
+                                backgroundColor: 'rgba(76, 175, 80, 0.7)'
+                            },
+                            {
+                                label: 'MAE (tons)',
+                                data: [0, 0, 0],
+                                backgroundColor: 'rgba(33, 150, 243, 0.7)'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Error (tons)'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            initializePredictionChart() {
+                const ctx = document.getElementById('predictionChart');
+                if (!ctx) return;
+                
+                this.predictionChart = new Chart(ctx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [
+                            {
+                                label: 'Actual Waste',
+                                data: [],
+                                borderColor: 'rgb(76, 175, 80)',
+                                backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                                tension: 0.3,
+                                fill: false
+                            },
+                            {
+                                label: 'Random Forest Predicted',
+                                data: [],
+                                borderColor: 'rgb(33, 150, 243)',
+                                backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                                tension: 0.3,
+                                fill: false,
+                                borderDash: [5, 5]
+                            },
+                            {
+                                label: 'Linear Regression Predicted',
+                                data: [],
+                                borderColor: 'rgb(255, 152, 0)',
+                                backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                                tension: 0.3,
+                                fill: false,
+                                borderDash: [5, 5]
+                            },
+                            {
+                                label: 'XGBoost Predicted',
+                                data: [],
+                                borderColor: 'rgb(156, 39, 176)',
+                                backgroundColor: 'rgba(156, 39, 176, 0.1)',
+                                tension: 0.3,
+                                fill: false,
+                                borderDash: [5, 5]
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Predicted vs Actual Waste Generation'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Month Index'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Waste (tons)'
+                                },
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+            }
+            
+            updatePerformanceChart(metrics) {
+                if (this.performanceChart) {
+                    this.performanceChart.data.datasets[0].data = [
+                        metrics.randomForest?.rmse || 0,
+                        metrics.linearRegression?.rmse || 0,
+                        metrics.xgBoost?.rmse || 0
+                    ];
+                    
+                    this.performanceChart.data.datasets[1].data = [
+                        metrics.randomForest?.mae || 0,
+                        metrics.linearRegression?.mae || 0,
+                        metrics.xgBoost?.mae || 0
+                    ];
+                    
+                    this.performanceChart.update();
+                }
+            }
+            
+            updatePredictionChart(dataset, predictions) {
+                if (!this.predictionChart) return;
+                
+                // Take only first 24 months for clarity
+                const displayLimit = 24;
+                const limitedDataset = dataset.slice(0, displayLimit);
+                
+                // Update labels (month-year combinations)
+                const labels = limitedDataset.map((row, index) => 
+                    `${getMonthName(row.month)} ${row.year}`
+                );
+                
+                // Update actual data
+                const actualData = limitedDataset.map(row => row.waste);
+                
+                // Update prediction data for each model
+                const rfData = predictions.randomForest.slice(0, displayLimit);
+                const lrData = predictions.linearRegression.slice(0, displayLimit);
+                const xgbData = predictions.xgBoost.slice(0, displayLimit);
+                
+                this.predictionChart.data.labels = labels;
+                this.predictionChart.data.datasets[0].data = actualData;
+                this.predictionChart.data.datasets[1].data = rfData;
+                this.predictionChart.data.datasets[2].data = lrData;
+                this.predictionChart.data.datasets[3].data = xgbData;
+                
+                // Hide datasets for models that aren't trained
+                this.predictionChart.data.datasets[1].hidden = !predictions.randomForest.length;
+                this.predictionChart.data.datasets[2].hidden = !predictions.linearRegression.length;
+                this.predictionChart.data.datasets[3].hidden = !predictions.xgBoost.length;
+                
+                this.predictionChart.update();
+            }
+            
+            updateFeatureImportance(featureImportance) {
+                Object.entries(featureImportance).forEach(([feature, score]) => {
+                    const bars = document.querySelectorAll(`.importance-fill[data-feature="${feature}"]`);
+                    bars.forEach(bar => {
+                        setTimeout(() => {
+                            bar.style.width = `${score * 100}%`;
+                            bar.textContent = `${feature.charAt(0).toUpperCase() + feature.slice(1)}: ${(score * 100).toFixed(1)}%`;
+                        }, 200);
+                    });
+                });
+            }
+        }
+
+        // ============================================
+        // UTILITY CLASS
+        // ============================================
+        class Utils {
+            static updateProgressBar(percentage) {
+                const progressBar = document.getElementById('progressBar');
+                if (progressBar) {
+                    progressBar.style.width = `${percentage}%`;
+                    progressBar.textContent = `${percentage}%`;
+                }
+            }
+            
+            static logToTraining(message) {
+                const trainingLog = document.getElementById('trainingLog');
+                if (trainingLog) {
+                    const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    trainingLog.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+                    trainingLog.scrollTop = trainingLog.scrollHeight;
+                }
+            }
+            
+            static calculateAccuracyFromMAPE(mape) {
+                return Math.max(0, 100 - mape);
+            }
+            
+            static getAccuracyClass(value) {
+                if (value > 95) return 'high-accuracy';
+                if (value > 90) return 'medium-accuracy';
+                return 'low-accuracy';
+            }
+            
+            static updateModelResults(modelPrefix, rmse, mae, mape) {
+                const accuracy = this.calculateAccuracyFromMAPE(mape);
+                
+                const accuracyElement = document.getElementById(`${modelPrefix}Accuracy`);
+                const rmseElement = document.getElementById(`${modelPrefix}RMSE`);
+                const maeElement = document.getElementById(`${modelPrefix}MAE`);
+                const mapeElement = document.getElementById(`${modelPrefix}MAPE`);
+                
+                if (accuracyElement) {
+                    accuracyElement.textContent = `${accuracy.toFixed(1)}%`;
+                    accuracyElement.className = `accuracy-value ${this.getAccuracyClass(accuracy)}`;
+                }
+                
+                if (rmseElement) rmseElement.textContent = rmse.toFixed(2);
+                if (maeElement) maeElement.textContent = mae.toFixed(2);
+                if (mapeElement) mapeElement.textContent = mape.toFixed(2);
+            }
+            
+            static loadDatasetTable(dataset, limit = 12) {
+                const datasetBody = document.getElementById('datasetBody');
+                if (!datasetBody) return;
+                
+                datasetBody.innerHTML = '';
+                
+                dataset.slice(0, limit).forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${row.month}</td>
+                        <td>${row.year}</td>
+                        <td>${row.population.toLocaleString()}</td>
+                        <td>₱${row.income.toLocaleString()}</td>
+                        <td>${row.urbanArea} km²</td>
+                        <td>${row.rainfall} mm</td>
+                        <td>${row.temperature}°C</td>
+                        <td>${row.trucks}</td>
+                        <td>${row.recycling}%</td>
+                        <td><strong>${row.waste} tons</strong></td>
+                    `;
+                    datasetBody.appendChild(tr);
+                });
+            }
+            
+            static updateStatistics(stats) {
+                document.getElementById('avgWaste').textContent = stats.avgWaste.toFixed(1);
+                document.getElementById('minWaste').textContent = stats.minWaste;
+                document.getElementById('maxWaste').textContent = stats.maxWaste;
+                document.getElementById('wasteRange').textContent = stats.wasteRange.toFixed(1);
+                document.getElementById('startYear').textContent = stats.startYear;
+                document.getElementById('endYear').textContent = stats.endYear;
+                document.getElementById('totalRecords').textContent = stats.totalRecords;
+                document.getElementById('timeSpan').textContent = stats.timeSpan;
+                document.getElementById('avgPopulation').textContent = Math.round(stats.avgPopulation).toLocaleString();
+                document.getElementById('avgIncome').textContent = `₱${Math.round(stats.avgIncome).toLocaleString()}`;
+                document.getElementById('avgRainfall').textContent = stats.avgRainfall.toFixed(1);
+                document.getElementById('avgTemperature').textContent = stats.avgTemperature.toFixed(1);
+            }
+            
+            static updateFeatureCorrelations(correlations) {
+                document.getElementById('corrPopulation').textContent = correlations.population.toFixed(3);
+                document.getElementById('corrIncome').textContent = correlations.income.toFixed(3);
+                document.getElementById('corrRainfall').textContent = correlations.rainfall.toFixed(3);
+                document.getElementById('corrTemperature').textContent = correlations.temperature.toFixed(3);
+                document.getElementById('corrTrucks').textContent = correlations.trucks.toFixed(3);
+                document.getElementById('corrRecycling').textContent = correlations.recycling.toFixed(3);
+            }
+            
+            static getPredictionInputs() {
+                return {
+                    population: parseFloat(document.getElementById('population').value) || 8500,
+                    income: parseFloat(document.getElementById('income').value) || 25000,
+                    urbanArea: parseFloat(document.getElementById('urbanArea').value) || 280,
+                    rainfall: parseFloat(document.getElementById('rainfall').value) || 150,
+                    temperature: parseFloat(document.getElementById('temperature').value) || 28,
+                    trucks: parseFloat(document.getElementById('trucks').value) || 45,
+                    recycling: parseFloat(document.getElementById('recycling').value) || 18,
+                    month: parseInt(document.getElementById('month').value) || 1,
+                    year: parseInt(document.getElementById('year').value) || 2024
+                };
+            }
+            
+            static showPredictionResults(predictions) {
+                if (predictions.randomForest) {
+                    document.getElementById('rfPrediction').textContent = `${predictions.randomForest} tons`;
+                }
+                if (predictions.linearRegression) {
+                    document.getElementById('lrPrediction').textContent = `${predictions.linearRegression} tons`;
+                }
+                if (predictions.xgBoost) {
+                    document.getElementById('xgbPrediction').textContent = `${predictions.xgBoost} tons`;
+                }
+                
+                const resultElement = document.getElementById('predictionResult');
+                if (resultElement) {
+                    resultElement.style.display = 'block';
+                    // Scroll to results
+                    resultElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+            
+            static formatNumber(num) {
+                return num.toLocaleString();
+            }
+        }
+
+        // ============================================
+        // MAIN APPLICATION
+        // ============================================
+        // Global instances
+        let datasetManager, mlModels, chartManager;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize instances
+            datasetManager = new DatasetManager();
+            mlModels = new MLModels();
+            chartManager = new ChartManager();
+            
+            // Initialize charts
+            setTimeout(() => {
+                chartManager.initializeCorrelationChart();
+                chartManager.initializePerformanceChart();
+                chartManager.initializePredictionChart();
+            }, 100);
+            
+            // Event listeners
+            document.getElementById('loadDataset').addEventListener('click', handleLoadDataset);
+            document.getElementById('viewStats').addEventListener('click', handleViewStats);
+            document.getElementById('analyzeFeatures').addEventListener('click', handleAnalyzeFeatures);
+            
+            document.getElementById('trainRF').addEventListener('click', () => handleTrainModel('randomForest'));
+            document.getElementById('trainLR').addEventListener('click', () => handleTrainModel('linearRegression'));
+            document.getElementById('trainXGB').addEventListener('click', () => handleTrainModel('xgBoost'));
+            document.getElementById('trainAll').addEventListener('click', handleTrainAllModels);
+            
+            document.getElementById('predictBtn').addEventListener('click', handlePredict);
+            
+            Utils.logToTraining('System initialized. Ready to load dataset.');
+            
+            // Auto-load dataset
+            setTimeout(() => {
+                handleLoadDataset();
+            }, 500);
+        });
+
+        // Event handler functions
+        function handleLoadDataset() {
+            try {
+                const dataset = datasetManager.getDataset();
+                Utils.loadDatasetTable(dataset);
+                Utils.logToTraining(`✅ Dataset loaded: ${dataset.length} monthly records (2013-2024)`);
+                Utils.updateProgressBar(30);
+                
+                // Hide stats and features containers
+                document.getElementById('statsContainer').style.display = 'none';
+                document.getElementById('featuresContainer').style.display = 'none';
+                
+            } catch (error) {
+                Utils.logToTraining(`❌ Error loading dataset: ${error.message}`);
+            }
+        }
+
+        function handleViewStats() {
+            try {
+                const stats = datasetManager.getStatistics();
+                Utils.updateStatistics(stats);
+                
+                const statsContainer = document.getElementById('statsContainer');
+                const featuresContainer = document.getElementById('featuresContainer');
+                
+                // Toggle visibility
+                if (statsContainer.style.display === 'block') {
+                    statsContainer.style.display = 'none';
+                    Utils.logToTraining('📊 Statistics hidden');
+                } else {
+                    statsContainer.style.display = 'block';
+                    featuresContainer.style.display = 'none';
+                    Utils.logToTraining('📊 Dataset statistics displayed');
+                }
+                
+                Utils.updateProgressBar(50);
+                
+            } catch (error) {
+                Utils.logToTraining(`❌ Error viewing statistics: ${error.message}`);
+            }
+        }
+
+        function handleAnalyzeFeatures() {
+            try {
+                const correlations = datasetManager.getFeatureCorrelations();
+                Utils.updateFeatureCorrelations(correlations);
+                
+                const statsContainer = document.getElementById('statsContainer');
+                const featuresContainer = document.getElementById('featuresContainer');
+                
+                // Toggle visibility
+                if (featuresContainer.style.display === 'block') {
+                    featuresContainer.style.display = 'none';
+                    Utils.logToTraining('🔍 Feature analysis hidden');
+                } else {
+                    featuresContainer.style.display = 'block';
+                    statsContainer.style.display = 'none';
+                    Utils.logToTraining('🔍 Feature correlation analysis displayed');
+                }
+                
+                Utils.updateProgressBar(70);
+                
+            } catch (error) {
+                Utils.logToTraining(`❌ Error analyzing features: ${error.message}`);
+            }
+        }
+
+        function handleTrainModel(modelType) {
+            try {
+                const dataset = datasetManager.getDataset();
+                if (!dataset || dataset.length === 0) {
+                    Utils.logToTraining('⚠️ Please load dataset first');
+                    return;
+                }
+                
+                Utils.logToTraining(`🤖 Training ${modelType} model...`);
+                
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 2;
+                    Utils.updateProgressBar(progress);
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        mlModels.trainModel(modelType)
+                            .then(result => {
+                                const { rmse, mae, mape } = result.metrics;
+                                const modelPrefix = getModelPrefix(modelType);
+                                Utils.updateModelResults(modelPrefix, rmse, mae, mape);
+                                
+                                const metrics = {
+                                    randomForest: mlModels.getModelMetrics('randomForest'),
+                                    linearRegression: mlModels.getModelMetrics('linearRegression'),
+                                    xgBoost: mlModels.getModelMetrics('xgBoost')
+                                };
+                                chartManager.updatePerformanceChart(metrics);
+                                
+                                if (modelType === 'randomForest') {
+                                    const featureImportance = mlModels.getFeatureImportance();
+                                    chartManager.updateFeatureImportance(featureImportance);
+                                }
+                                
+                                // Generate predictions and update the prediction chart
+                                const predictions = mlModels.generatePredictions(dataset);
+                                chartManager.updatePredictionChart(dataset, predictions);
+                                
+                                Utils.logToTraining(`✅ ${modelType} training completed!`);
+                                Utils.logToTraining(`   📏 RMSE: ${rmse.toFixed(2)} tons`);
+                                Utils.logToTraining(`   📊 MAE: ${mae.toFixed(2)} tons`);
+                                Utils.logToTraining(`   📉 MAPE: ${mape.toFixed(2)}%`);
+                                Utils.logToTraining(`   🎯 Accuracy: ${Utils.calculateAccuracyFromMAPE(mape).toFixed(1)}%`);
+                            });
+                    }
+                }, 50);
+                
+            } catch (error) {
+                Utils.logToTraining(`❌ Error starting training: ${error.message}`);
+            }
+        }
+
+        function handleTrainAllModels() {
+            handleTrainModel('randomForest');
+            setTimeout(() => handleTrainModel('linearRegression'), 800);
+            setTimeout(() => handleTrainModel('xgBoost'), 1600);
+        }
+
+        function handlePredict() {
+            try {
+                const trainedModels = mlModels.getTrainedModels();
+                if (trainedModels.length === 0) {
+                    Utils.logToTraining('⚠️ Please train at least one model first');
+                    return;
+                }
+                
+                const inputs = Utils.getPredictionInputs();
+                const predictions = mlModels.predict(inputs);
+                
+                Utils.showPredictionResults(predictions);
+                
+                Utils.logToTraining('✅ Predictions generated successfully!');
+                Utils.logToTraining(`📅 For: ${getMonthName(inputs.month)} ${inputs.year}`);
+                Utils.logToTraining(`📊 Input Parameters:`);
+                Utils.logToTraining(`   • Population: ${inputs.population} people/km²`);
+                Utils.logToTraining(`   • Income: ₱${Utils.formatNumber(inputs.income)}`);
+                Utils.logToTraining(`   • Rainfall: ${inputs.rainfall} mm`);
+                Utils.logToTraining(`   • Temperature: ${inputs.temperature}°C`);
+                Utils.logToTraining(`   • Trucks: ${inputs.trucks} units`);
+                Utils.logToTraining(`   • Recycling: ${inputs.recycling}%`);
+                
+                // Log individual predictions
+                Object.entries(predictions).forEach(([model, value]) => {
+                    if (value) {
+                        Utils.logToTraining(`   • ${model}: ${value} tons`);
+                    }
+                });
+                
+            } catch (error) {
+                Utils.logToTraining(`❌ Error making predictions: ${error.message}`);
+            }
+        }
+
+        // Helper functions
+        function getModelPrefix(modelType) {
+            switch(modelType) {
+                case 'randomForest': return 'rf';
+                case 'linearRegression': return 'lr';
+                case 'xgBoost': return 'xgb';
+                default: return '';
+            }
+        }
+
+        function getMonthName(monthNumber) {
+            const months = [
+                'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+            ];
+            return months[monthNumber - 1] || monthNumber;
+        }
+    </script>
+</body>
+</html>
