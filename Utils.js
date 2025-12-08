@@ -1,19 +1,7 @@
 class Utils {
-    static updateProgressBar(percentage) {
-        const progressBar = document.getElementById('progressBar');
-        if (progressBar) {
-            progressBar.style.width = `${percentage}%`;
-            progressBar.textContent = `${percentage}%`;
-        }
-    }
-    
     static logToTraining(message) {
-        const trainingLog = document.getElementById('trainingLog');
-        if (trainingLog) {
-            const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            trainingLog.innerHTML += `<div>[${timestamp}] ${message}</div>`;
-            trainingLog.scrollTop = trainingLog.scrollHeight;
-        }
+        // Log removed as per request
+        console.log(message);
     }
     
     static calculateAccuracyFromMAPE(mape) {
@@ -44,54 +32,6 @@ class Utils {
         if (mapeElement) mapeElement.textContent = mape.toFixed(2);
     }
     
-    static loadDatasetTable(dataset, limit = 12) {
-        const datasetBody = document.getElementById('datasetBody');
-        if (!datasetBody) return;
-        
-        datasetBody.innerHTML = '';
-        
-        dataset.slice(0, limit).forEach(row => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${row.month}</td>
-                <td>${row.year}</td>
-                <td>${row.population.toLocaleString()}</td>
-                <td>₱${row.income.toLocaleString()}</td>
-                <td>${row.urbanArea} km²</td>
-                <td>${row.rainfall} mm</td>
-                <td>${row.temperature}°C</td>
-                <td>${row.trucks}</td>
-                <td>${row.recycling}%</td>
-                <td><strong>${row.waste} tons</strong></td>
-            `;
-            datasetBody.appendChild(tr);
-        });
-    }
-    
-    static updateStatistics(stats) {
-        document.getElementById('avgWaste').textContent = stats.avgWaste.toFixed(1);
-        document.getElementById('minWaste').textContent = stats.minWaste;
-        document.getElementById('maxWaste').textContent = stats.maxWaste;
-        document.getElementById('wasteRange').textContent = stats.wasteRange.toFixed(1);
-        document.getElementById('startYear').textContent = stats.startYear;
-        document.getElementById('endYear').textContent = stats.endYear;
-        document.getElementById('totalRecords').textContent = stats.totalRecords;
-        document.getElementById('timeSpan').textContent = stats.timeSpan;
-        document.getElementById('avgPopulation').textContent = Math.round(stats.avgPopulation).toLocaleString();
-        document.getElementById('avgIncome').textContent = `₱${Math.round(stats.avgIncome).toLocaleString()}`;
-        document.getElementById('avgRainfall').textContent = stats.avgRainfall.toFixed(1);
-        document.getElementById('avgTemperature').textContent = stats.avgTemperature.toFixed(1);
-    }
-    
-    static updateFeatureCorrelations(correlations) {
-        document.getElementById('corrPopulation').textContent = correlations.population.toFixed(3);
-        document.getElementById('corrIncome').textContent = correlations.income.toFixed(3);
-        document.getElementById('corrRainfall').textContent = correlations.rainfall.toFixed(3);
-        document.getElementById('corrTemperature').textContent = correlations.temperature.toFixed(3);
-        document.getElementById('corrTrucks').textContent = correlations.trucks.toFixed(3);
-        document.getElementById('corrRecycling').textContent = correlations.recycling.toFixed(3);
-    }
-    
     static getPredictionInputs() {
         return {
             population: parseFloat(document.getElementById('population').value) || 8500,
@@ -107,12 +47,6 @@ class Utils {
     }
     
     static showPredictionResults(predictions) {
-        if (predictions.randomForest) {
-            document.getElementById('rfPrediction').textContent = `${predictions.randomForest} tons`;
-        }
-        if (predictions.linearRegression) {
-            document.getElementById('lrPrediction').textContent = `${predictions.linearRegression} tons`;
-        }
         if (predictions.xgBoost) {
             document.getElementById('xgbPrediction').textContent = `${predictions.xgBoost} tons`;
         }
@@ -138,17 +72,5 @@ class Utils {
                 }, 200);
             });
         });
-    }
-    
-    static downloadCSV(filename, csvData) {
-        const blob = new Blob([csvData], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
     }
 }
